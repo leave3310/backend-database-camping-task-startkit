@@ -283,7 +283,25 @@ GROUP BY user_id;
     -- from ( 用戶王小明的購買堂數 ) as "CREDIT_PURCHASE"
     -- inner join ( 用戶王小明的已使用堂數) as "COURSE_BOOKING"
     -- on "COURSE_BOOKING".user_id = "CREDIT_PURCHASE".user_id;
-
+SELECT
+    "CREDIT_PURCHASE".user_id,
+    ("CREDIT_PURCHASE".total_credit - "COURSE_BOOKING".used_credit) AS "remaining_credit"
+FROM (
+    SELECT 
+        user_id ,
+        sum(purchased_credits) AS "total_credit"
+    FROM "CREDIT_PURCHASE" GROUP BY user_id  
+) AS "CREDIT_PURCHASE"
+INNER JOIN (
+    SELECT 
+        user_id,
+        count(*) used_credit
+    FROM "COURSE_BOOKING"
+    WHERE status = '上課中'
+    GROUP BY user_id
+) as "COURSE_BOOKING"
+ON "COURSE_BOOKING".user_id = "CREDIT_PURCHASE".user_id  
+;
 
 -- ████████  █████   █     ███  
 --   █ █   ██    █  █     █     
